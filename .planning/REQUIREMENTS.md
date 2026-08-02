@@ -21,7 +21,7 @@
 - [ ] **CAT-02**: User có thể tạo child category thuộc một parent (ví dụ: Food > Breakfast, Food > Coffee)
 - [ ] **CAT-03**: User có thể sửa tên, icon, color của category (parent hoặc child)
 - [ ] **CAT-04**: User có thể xóa category (child hoặc parent nếu không có child)
-- [ ] **CAT-05**: System pre-seed danh sách default categories khi khởi tạo (Food, Transport, Shopping, Bills, Entertainment, Health, Education, Others)
+- [x] **CAT-05**: System pre-seed danh sách default categories khi khởi tạo (Food, Transport, Shopping, Bills, Entertainment, Health, Education, Others)
 - [ ] **CAT-06**: Mỗi category có icon và color để phân biệt trực quan
 
 ### Transaction Categorization
@@ -104,7 +104,7 @@
 | CAT-02 | Phase 4 | Pending |
 | CAT-03 | Phase 4 | Pending |
 | CAT-04 | Phase 4 | Pending |
-| CAT-05 | Phase 1 | Pending |
+| CAT-05 | Phase 1 | Complete |
 | CAT-06 | Phase 4 | Pending |
 | TXN-01 | Phase 4 | Pending |
 | TXN-02 | Phase 4 | Pending |
@@ -128,6 +128,7 @@
 | INF-05 | Phase 3 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 30 total
 - Mapped to phases: 30
 - Unmapped: 0 ✓
