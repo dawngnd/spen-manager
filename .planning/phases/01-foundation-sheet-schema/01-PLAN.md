@@ -60,7 +60,7 @@ Output: Initialized GAS project with `Setup.ts`, `Utils.ts`, and `API.ts`.
   <name>Task 2: Implement Setup script for schema and data seeding</name>
   <files>src/Setup.ts</files>
   <read_first>.planning/phases/01-foundation-sheet-schema/01-RESEARCH.md</read_first>
-  <action>Create `src/Setup.ts`. Implement a `setup()` function that creates/formats 4 sheets: Transactions, Categories, Budgets, Settings. Create the columns exactly as defined in the RESEARCH document. Implement logic to seed default parent categories (Food, Transport, Shopping, Bills, Entertainment, Health, Education, Others) with sensible native emojis for icons and hex codes for colors in the Categories sheet, satisfying CAT-05.</action>
+  <action>Create src/Setup.ts. Implement a setup() function that opens the target spreadsheet using the ID from Script Properties (e.g., PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID')). It should create/format 4 sheets: Transactions, Categories, Budgets, Settings. Create the columns exactly as defined in the RESEARCH document. Implement logic to seed default parent categories (Food, Transport, Shopping, Bills, Entertainment, Health, Education, Others) with sensible native emojis for icons and hex codes for colors in the Categories sheet, satisfying CAT-05.</action>
   <verify>Check that `src/Setup.ts` exports/defines `setup()` function and contains headers/seed data logic.</verify>
   <acceptance_criteria>
     - `setup()` function handles tab creation (Transactions, Categories, Budgets, Settings)
