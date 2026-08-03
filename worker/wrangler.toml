@@ -1,0 +1,9 @@
+name = "spen-manager-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[vars]
+GAS_WEB_APP_URL = "https://script.google.com/macros/s/TODO/exec"
+
+[env.production]
+# TELEGRAM_BOT_TOKEN will be provided as a secret
