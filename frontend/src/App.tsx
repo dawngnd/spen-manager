@@ -40,7 +40,7 @@ function App() {
   }, [setInitData, setTheme]);
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Layout>
         <Routes>
           <Route path="/" element={<Inbox />} />
