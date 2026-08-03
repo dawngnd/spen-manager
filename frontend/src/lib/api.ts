@@ -2,13 +2,22 @@ import { useAppStore } from '@/store';
 
 export interface Transaction {
   id: string;
+  gmail_message_id: string;
   date: string;
   amount: number;
   type: string;
-  description: string;
   merchant: string;
-  category_id: string | null;
-  gmail_message_id: string;
+  reference: string;
+  status: string;
+  category_parent_id: string;
+  category_child_id: string;
+}
+
+export interface Budget {
+  id: string;
+  category_id: string;
+  month: string;
+  amount: number;
 }
 
 export interface Category {

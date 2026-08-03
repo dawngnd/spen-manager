@@ -14,7 +14,7 @@ export default function Inbox() {
   });
 
   const transactions = data?.data || [];
-  const uncategorized = transactions.filter(t => !t.category_id);
+  const uncategorized = transactions.filter(t => !t.category_parent_id && !t.category_child_id);
 
   const handleTransactionClick = (id: string) => {
     setSelectedTxnId(id);
@@ -69,7 +69,7 @@ export default function Inbox() {
             >
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <h3 className="font-semibold text-card-foreground line-clamp-1">{t.merchant || t.description || 'Unknown'}</h3>
+                  <h3 className="font-semibold text-card-foreground line-clamp-1">{t.merchant || 'Unknown'}</h3>
                   <p className="text-sm text-muted-foreground">{new Date(t.date).toLocaleDateString('vi-VN')}</p>
                 </div>
                 <div className="text-right">
@@ -82,7 +82,7 @@ export default function Inbox() {
                   </span>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground line-clamp-2">{t.description}</p>
+              <p className="text-sm text-muted-foreground line-clamp-2">{t.reference || t.merchant}</p>
             </div>
           ))}
         </div>

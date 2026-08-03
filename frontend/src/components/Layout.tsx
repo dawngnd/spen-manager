@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Inbox as InboxIcon, Tags as TagsIcon } from 'lucide-react';
+import { Inbox as InboxIcon, Tags as TagsIcon, BarChart3, Wallet } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface LayoutProps {
@@ -13,6 +13,8 @@ export default function Layout({ children }: LayoutProps) {
 
   const tabs = [
     { name: 'Inbox', path: '/', icon: InboxIcon },
+    { name: 'Dashboard', path: '/dashboard', icon: BarChart3 },
+    { name: 'Budget', path: '/budget', icon: Wallet },
     { name: 'Categories', path: '/categories', icon: TagsIcon },
   ];
 
