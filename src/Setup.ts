@@ -48,6 +48,16 @@ export function setup() {
   ]]);
   settingsSheet.getRange(1, 1, 1, 2).setFontWeight('bold');
 
+  // 5. Unparsed
+  let unparsedSheet = ss.getSheetByName('Unparsed');
+  if (!unparsedSheet) {
+    unparsedSheet = ss.insertSheet('Unparsed');
+  }
+  unparsedSheet.getRange(1, 1, 1, 4).setValues([[
+    'date', 'message_id', 'subject', 'body'
+  ]]);
+  unparsedSheet.getRange(1, 1, 1, 4).setFontWeight('bold');
+
   // Seed default categories
   const defaultCategories = [
     { id: Utilities.getUuid(), name: 'Food', parent_id: '', icon: '🍔', color: '#F87171' },
