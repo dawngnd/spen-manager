@@ -7,13 +7,13 @@
 
 ### Email Pipeline
 
-- [ ] **PIPE-01**: System tự động fetch email mới từ Gmail theo interval (time-triggered, mỗi 5-10 phút)
-- [ ] **PIPE-02**: System parse email Timo Bank bằng regex để trích xuất: số tiền, loại giao dịch (chi/thu/chuyển), merchant/mô tả, ngày giờ, mã tham chiếu
-- [ ] **PIPE-03**: System lưu giao dịch vào Google Sheet với trạng thái "uncategorized"
-- [ ] **PIPE-04**: System deduplicate giao dịch dựa trên gmail_message_id — không xử lý lại email đã parse
-- [ ] **PIPE-05**: System đưa email không parse được vào hàng đợi "unparsed" thay vì bỏ qua
-- [ ] **PIPE-06**: Email parser có kiến trúc provider-configurable — dễ dàng thêm bank mới (VCB, Techcombank...)
-- [ ] **PIPE-07**: System gắn label "processed" cho email đã xử lý trên Gmail
+- [x] **PIPE-01**: System tự động fetch email mới từ Gmail theo interval (time-triggered, mỗi 5-10 phút)
+- [x] **PIPE-02**: System parse email Timo Bank bằng regex để trích xuất: số tiền, loại giao dịch (chi/thu/chuyển), merchant/mô tả, ngày giờ, mã tham chiếu
+- [x] **PIPE-03**: System lưu giao dịch vào Google Sheet với trạng thái "uncategorized"
+- [x] **PIPE-04**: System deduplicate giao dịch dựa trên gmail_message_id — không xử lý lại email đã parse
+- [x] **PIPE-05**: System đưa email không parse được vào hàng đợi "unparsed" thay vì bỏ qua
+- [x] **PIPE-06**: Email parser có kiến trúc provider-configurable — dễ dàng thêm bank mới (VCB, Techcombank...)
+- [x] **PIPE-07**: System gắn label "processed" cho email đã xử lý trên Gmail
 
 ### Categories
 
@@ -47,8 +47,8 @@
 
 ### Telegram Integration
 
-- [ ] **TG-01**: System gửi Telegram notification ngay khi parse được giao dịch mới (số tiền, merchant, loại)
-- [ ] **TG-02**: Notification có inline button "Open Spen Manager" để mở Mini App trực tiếp
+- [x] **TG-01**: System gửi Telegram notification ngay khi parse được giao dịch mới (số tiền, merchant, loại)
+- [x] **TG-02**: Notification có inline button "Open Spen Manager" để mở Mini App trực tiếp
 - [ ] **TG-03**: Mini App tự động sync dark/light theme với Telegram
 
 ### Infrastructure
@@ -93,13 +93,13 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PIPE-01 | Phase 2 | Pending |
-| PIPE-02 | Phase 2 | Pending |
-| PIPE-03 | Phase 2 | Pending |
-| PIPE-04 | Phase 2 | Pending |
-| PIPE-05 | Phase 2 | Pending |
-| PIPE-06 | Phase 2 | Pending |
-| PIPE-07 | Phase 2 | Pending |
+| PIPE-01 | Phase 2 | Complete |
+| PIPE-02 | Phase 2 | Complete |
+| PIPE-03 | Phase 2 | Complete |
+| PIPE-04 | Phase 2 | Complete |
+| PIPE-05 | Phase 2 | Complete |
+| PIPE-06 | Phase 2 | Complete |
+| PIPE-07 | Phase 2 | Complete |
 | CAT-01 | Phase 4 | Pending |
 | CAT-02 | Phase 4 | Pending |
 | CAT-03 | Phase 4 | Pending |
@@ -118,8 +118,8 @@
 | BDG-01 | Phase 5 | Pending |
 | BDG-02 | Phase 5 | Pending |
 | BDG-03 | Phase 5 | Pending |
-| TG-01 | Phase 2 | Pending |
-| TG-02 | Phase 2 | Pending |
+| TG-01 | Phase 2 | Complete |
+| TG-02 | Phase 2 | Complete |
 | TG-03 | Phase 4 | Pending |
 | INF-01 | Phase 6 | Pending |
 | INF-02 | Phase 6 | Pending |
