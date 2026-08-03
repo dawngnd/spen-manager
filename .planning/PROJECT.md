@@ -12,13 +12,11 @@ Mọi giao dịch ngân hàng được tự động capture và dễ dàng phân
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Lưu giao dịch vào Google Sheet (chưa phân loại) (Validated in Phase 1: Foundation & Sheet Schema)
+- [x] Email pipeline tự động fetch + parse email ngân hàng (clone logic từ email-to-sheet, provider-based config, bắt đầu với Timo) (Validated in Phase 2: Email Pipeline & Telegram Notifications)
+- [x] Gửi Telegram notification khi có giao dịch mới (Validated in Phase 2: Email Pipeline & Telegram Notifications)
 
 ### Active
-
-- [ ] Email pipeline tự động fetch + parse email ngân hàng (clone logic từ email-to-sheet, provider-based config, bắt đầu với Timo)
-- [ ] Lưu giao dịch vào Google Sheet (chưa phân loại)
-- [ ] Gửi Telegram notification khi có giao dịch mới
 - [ ] Telegram Mini App (Vite + React + TypeScript) để phân loại giao dịch
 - [ ] Hệ thống category 2 cấp (parent/child) — quản lý qua Mini App
 - [ ] Hỗ trợ 3 loại giao dịch: chi (expense), thu (income), chuyển khoản (transfer)
@@ -78,4 +76,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-02 after initialization*
+*Last updated: 2026-08-03 after Phase 2 completion*
