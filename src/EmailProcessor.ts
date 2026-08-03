@@ -1,6 +1,7 @@
 import { withLock } from './Utils';
 import { EmailProvider } from './providers/EmailProvider';
 import { TimoProvider } from './providers/TimoProvider';
+import { sendMessage } from './Telegram';
 
 // Register providers here
 const PROVIDERS: EmailProvider[] = [TimoProvider];
@@ -77,3 +78,128 @@ export function fetchUnprocessedEmails(processedIds: Set<string>): GoogleAppsScr
 
   return messagesToProcess;
 }
+
+function getOrCreateLabel(labelName: string): GoogleAppsScript.Gmail.GmailLabel {
+  let label = GmailApp.getUserLabelByName(labelName);
+  if (!label) {
+    label = GmailApp.createLabel(labelName);
+  }
+  return label;
+}
+
+export function processEmails(): void {
+  const processedIds = getProcessedMessageIds();
+  const messages = fetchUnprocessedEmails(processedIds);
+  
+  if (messages.length === 0) {
+    return;
+  }
+
+  const scriptProperties = PropertiesService.getScriptProperties();
+  const spreadsheetId = scriptProperties.getProperty('SPREADSHEET_ID');
+  const miniAppUrl = scriptProperties.getProperty('MINI_APP_URL');
+  
+  if (!spreadsheetId) {
+    console.error('SPREADSHEET_ID is not set in Script Properties.');
+    return;
+  }
+
+  const label = getOrCreateLabel('spen-processed');
+  
+  // Group messages by thread to minimize label operations
+  const threadMessagesMap = new Map<string, GoogleAppsScript.Gmail.GmailMessage[]>();
+  
+  for (const message of messages) {
+    const threadId = message.getThread().getId();
+    if (!threadMessagesMap.has(threadId)) {
+      threadMessagesMap.set(threadId, []);
+    }
+    threadMessagesMap.get(threadId)!.push(message);
+  }
+
+  // Iterate over threads and their messages
+  for (const [threadId, threadMsgs] of threadMessagesMap.entries()) {
+    let allParsedInThread = true;
+    
+    for (const message of threadMsgs) {
+      const subject = message.getSubject();
+      const from = message.getFrom();
+      const body = message.getPlainBody() || message.getBody(); // fallback to HTML body if plain is not available
+      const messageId = message.getId();
+      const dateStr = message.getDate().toISOString();
+
+      const provider = PROVIDERS.find(p => p.match(subject, from));
+      if (!provider) continue;
+
+      const parsedTx = provider.parse(body, subject);
+      
+      withLock(() => {
+        const ss = SpreadsheetApp.openById(spreadsheetId);
+        
+        if (parsedTx) {
+          // Successfully parsed -> append to Transactions sheet
+          const transactionsSheet = ss.getSheetByName('Transactions');
+          if (transactionsSheet) {
+            // 'id', 'gmail_message_id', 'date', 'amount', 'type', 'merchant', 'reference', 'status', 'category_parent_id', 'category_child_id'
+            transactionsSheet.appendRow([
+              Utilities.getUuid(),
+              messageId,
+              parsedTx.date,
+              parsedTx.amount,
+              parsedTx.type,
+              parsedTx.merchant,
+              parsedTx.reference,
+              'uncategorized',
+              '',
+              ''
+            ]);
+          }
+          
+          // Send Telegram notification
+          const msgText = `✅ *New ${parsedTx.type.toUpperCase()}*\n\n` +
+                          `💰 Amount: ${parsedTx.amount.toLocaleString()} VND\n` +
+                          `🏪 Merchant: ${parsedTx.merchant}\n` +
+                          `📅 Date: ${parsedTx.date.toLocaleString()}`;
+                          
+          const options: any = { parse_mode: 'HTML' };
+          if (miniAppUrl) {
+            options.reply_markup = {
+              inline_keyboard: [[
+                { text: 'Open Spen Manager', web_app: { url: miniAppUrl } }
+              ]]
+            };
+          }
+          sendMessage(msgText, options);
+          
+        } else {
+          // Failed to parse -> append to Unparsed sheet
+          allParsedInThread = false;
+          const unparsedSheet = ss.getSheetByName('Unparsed');
+          if (unparsedSheet) {
+            // 'date', 'message_id', 'subject', 'body'
+            unparsedSheet.appendRow([
+              new Date(),
+              messageId,
+              subject,
+              body.substring(0, 500) // Truncate body to prevent huge cells
+            ]);
+          }
+          
+          // Send silent Telegram notification
+          const silentMsg = `⚠️ *Failed to parse email*\n\n` +
+                            `Subject: ${subject}\n` +
+                            `From: ${from}\n` +
+                            `Message ID: ${messageId}`;
+          sendMessage(silentMsg, { disable_notification: true, parse_mode: 'HTML' });
+        }
+      });
+    }
+    
+    // Label thread as processed (even if some failed, they are in Unparsed queue and shouldn't be retried indefinitely)
+    if (threadMsgs.length > 0) {
+      const thread = threadMsgs[0].getThread();
+      thread.addLabel(label);
+    }
+  }
+}
+
