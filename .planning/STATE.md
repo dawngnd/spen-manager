@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: "### Phase 1: Foundation & Sheet Schema"
 status: unknown
 stopped_at: Phase 2 planned
-last_updated: "2026-08-03T02:35:39.306Z"
+last_updated: "2026-08-03T02:42:48.112Z"
 progress:
   total_phases: 6
   completed_phases: 1
@@ -24,7 +24,7 @@ Phase 1: Foundation & Sheet Schema
 See: .planning/PROJECT.md (updated 2026-08-02)
 
 **Core value:** Mọi giao dịch ngân hàng được tự động capture và dễ dàng phân loại
-**Current focus:** Phase 01 — foundation-sheet-schema
+**Current focus:** Phase 02 — email-pipeline-telegram-notifications
 
 ## Phase Status
 
