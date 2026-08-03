@@ -1,0 +1,70 @@
+name: Push Backend to Google Apps Script
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'esbuild.config.js'
+      - '.github/workflows/clasp-push.yml'
+
+jobs:
+  clasp-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build TypeScript → GAS bundle
+        run: npm run build
+
+      - name: Install clasp
+        run: npm install -g @google/clasp
+
+      - name: Write clasp credentials
+        env:
+          CLASP_REFRESH_TOKEN: ${{ secrets.CLASP_REFRESH_TOKEN }}
+        run: |
+          node -e "
+            const fs = require('fs');
+            const os = require('os');
+            const path = require('path');
+            const config = {
+              tokens: {
+                default: {
+                  client_id: '1072944905499-vm2v2i5dvn0a0d2o4ca36i1vge8cvbn0.apps.googleusercontent.com',
+                  client_secret: 'v6V3fKV_zWU7iw1DrpO1rknX',
+                  type: 'authorized_user',
+                  refresh_token: process.env.CLASP_REFRESH_TOKEN || ''
+                }
+              }
+            };
+            fs.writeFileSync(
+              path.join(os.homedir(), '.clasprc.json'),
+              JSON.stringify(config, null, 2)
+            );
+            console.log('.clasprc.json written successfully');
+          "
+
+      - name: Configure Script ID
+        env:
+          CLASP_SCRIPT_ID: ${{ secrets.CLASP_SCRIPT_ID }}
+        run: |
+          node -e "
+            const fs = require('fs');
+            const config = { scriptId: process.env.CLASP_SCRIPT_ID || '', rootDir: 'dist' };
+            fs.writeFileSync('.clasp.json', JSON.stringify(config, null, 2));
+            console.log('.clasp.json configured for dist/ push');
+          "
+
+      - name: Push to Google Apps Script
+        run: clasp push --force
