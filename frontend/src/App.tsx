@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useAppStore } from '@/store';
 import Layout from '@/components/Layout';
 import Inbox from '@/pages/Inbox';
+import { Categories } from '@/pages/Categories';
 
 function App() {
   const { setInitData, setTheme } = useAppStore();
@@ -41,7 +42,7 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Inbox />} />
-          <Route path="/categories" element={<div>Categories</div>} />
+          <Route path="/categories" element={<Categories />} />
         </Routes>
       </Layout>
     </BrowserRouter>

@@ -1,10 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiClient, type Category } from '@/lib/api'
+import { apiClient } from '@/lib/api'
+import type { Category } from '@/lib/api'
 
 export function useGetCategories() {
   return useQuery({
     queryKey: ['categories'],
-    queryFn: () => apiClient('get_categories'),
+    queryFn: () => apiClient<Category[]>('get_categories'),
   })
 }
 

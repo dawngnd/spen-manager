@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Inbox as InboxIcon, Tags as TagsIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';

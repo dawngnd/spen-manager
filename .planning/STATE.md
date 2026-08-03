@@ -30,10 +30,10 @@ See: .planning/PROJECT.md (updated 2026-08-02)
 
 | Phase | Name | Status |
 |-------|------|--------|
-| 1 | Foundation & Sheet Schema | ● In Progress |
-| 2 | Email Pipeline & Telegram Notifications | ○ Pending |
-| 3 | API & Authentication Layer | ○ Pending |
-| 4 | Mini App Core — Categorization & Categories | ○ Pending |
+| 1 | Foundation & Sheet Schema | ✅ Complete |
+| 2 | Email Pipeline & Telegram Notifications | ✅ Complete |
+| 3 | API & Authentication Layer | ✅ Complete |
+| 4 | Mini App Core — Categorization & Categories | ● In Progress |
 | 5 | Dashboard & Budget Tracking | ○ Pending |
 | 6 | CI/CD & Production Polish | ○ Pending |
 

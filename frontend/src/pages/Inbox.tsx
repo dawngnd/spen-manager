@@ -1,8 +1,13 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Inbox as InboxIcon } from 'lucide-react';
-import { apiClient, Transaction } from '@/lib/api';
+import { apiClient, type Transaction } from '@/lib/api';
+import { CategorizeDrawer } from '@/components/CategorizeDrawer';
 
 export default function Inbox() {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedTxnId, setSelectedTxnId] = useState<string | null>(null);
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['transactions'],
     queryFn: () => apiClient<Transaction[]>('get_transactions'),
@@ -10,6 +15,11 @@ export default function Inbox() {
 
   const transactions = data?.data || [];
   const uncategorized = transactions.filter(t => !t.category_id);
+
+  const handleTransactionClick = (id: string) => {
+    setSelectedTxnId(id);
+    setDrawerOpen(true);
+  };
 
   if (isLoading) {
     return (
@@ -48,16 +58,19 @@ export default function Inbox() {
         </div>
       ) : (
         <div className="space-y-3">
+          <p className="text-sm text-muted-foreground mb-2">
+            {uncategorized.length} transaction{uncategorized.length > 1 ? 's' : ''} to categorize
+          </p>
           {uncategorized.map(t => (
             <div 
               key={t.id} 
-              onClick={() => console.log('Transaction clicked:', t.id)}
-              className="p-4 border border-border rounded-lg bg-card cursor-pointer active:scale-[0.98] transition-transform"
+              onClick={() => handleTransactionClick(t.id)}
+              className="p-4 border border-border rounded-lg bg-card cursor-pointer active:scale-[0.98] transition-transform hover:border-primary/50"
             >
               <div className="flex justify-between items-start mb-2">
                 <div>
                   <h3 className="font-semibold text-card-foreground line-clamp-1">{t.merchant || t.description || 'Unknown'}</h3>
-                  <p className="text-sm text-muted-foreground">{new Date(t.date).toLocaleDateString()}</p>
+                  <p className="text-sm text-muted-foreground">{new Date(t.date).toLocaleDateString('vi-VN')}</p>
                 </div>
                 <div className="text-right">
                   <p className={`font-bold ${t.type.toLowerCase() === 'expense' ? 'text-destructive' : 'text-green-500'}`}>
@@ -74,6 +87,12 @@ export default function Inbox() {
           ))}
         </div>
       )}
+
+      <CategorizeDrawer
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        transactionId={selectedTxnId}
+      />
     </div>
   );
 }
