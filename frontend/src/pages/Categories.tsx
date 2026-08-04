@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useGetCategories, useUpsertCategory, useDeleteCategory } from "@/hooks/useCategories"
 import type { Category } from "@/lib/api"
-import { Plus, Edit2, Trash2, Loader2 } from "lucide-react"
+import { Plus, Edit2, Trash2, Loader2, RefreshCw } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 export function Categories() {
-  const { data: response, isLoading } = useGetCategories()
+  const { data: response, isLoading, refetch, isFetching } = useGetCategories()
   const categories = response?.data || []
   
   const upsertMutation = useUpsertCategory()
@@ -82,7 +82,17 @@ export function Categories() {
 
   return (
     <div className="flex-1 flex flex-col p-4 pb-24 relative overflow-y-auto">
-      <h1 className="text-2xl font-bold mb-6">Categories</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Categories</h1>
+        <button
+          onClick={() => refetch()}
+          disabled={isFetching}
+          className="p-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+          title="Reload categories"
+        >
+          <RefreshCw className={`w-5 h-5 ${isFetching ? 'animate-spin' : ''}`} />
+        </button>
+      </div>
 
       {categories.length === 0 ? (
         <div className="text-center text-muted-foreground py-8">

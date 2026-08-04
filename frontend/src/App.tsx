@@ -6,6 +6,7 @@ import Inbox from '@/pages/Inbox';
 import { Categories } from '@/pages/Categories';
 import Dashboard from '@/pages/Dashboard';
 import Budget from '@/pages/Budget';
+import Transactions from '@/pages/Transactions';
 
 function App() {
   const { setInitData, setTheme } = useAppStore();
@@ -73,6 +74,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/budget" element={<Budget />} />
           <Route path="/categories" element={<Categories />} />
+          <Route path="/transactions" element={<Transactions />} />
         </Routes>
       </Layout>
     </BrowserRouter>

@@ -9,7 +9,9 @@ export function useGetCategories() {
   return useQuery({
     queryKey: ['categories'],
     queryFn: () => apiClient<Category[]>('get_categories'),
-    enabled: !!initData, // Don't fetch until initData is populated
+    enabled: !!initData,
+    staleTime: Infinity,
+    gcTime: Infinity,
   })
 }
 

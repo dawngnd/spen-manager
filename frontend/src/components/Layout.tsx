@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Inbox as InboxIcon, Tags as TagsIcon, BarChart3, Wallet } from 'lucide-react';
+import { Inbox as InboxIcon, Tags as TagsIcon, BarChart3, Wallet, History } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface LayoutProps {
@@ -16,6 +16,7 @@ export default function Layout({ children }: LayoutProps) {
     { name: 'Dashboard', path: '/dashboard', icon: BarChart3 },
     { name: 'Budget', path: '/budget', icon: Wallet },
     { name: 'Categories', path: '/categories', icon: TagsIcon },
+    { name: 'Lịch sử', path: '/transactions', icon: History },
   ];
 
   return (
