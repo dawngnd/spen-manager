@@ -1,8 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api'
-import type { Transaction, ApiResponse } from '@/lib/api'
+import type { Transaction } from '@/lib/api'
 import { useAppStore } from '@/store'
-import { useCallback } from 'react'
 
 /**
  * Fetches only NEW (unfetched) transactions from server, merges into cache.
