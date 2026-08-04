@@ -56,6 +56,7 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, HEAD, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type, x-telegram-init-data',
+  'Access-Control-Max-Age': '86400',
 };
 
 export default {
