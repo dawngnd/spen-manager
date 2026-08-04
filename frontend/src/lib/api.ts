@@ -47,11 +47,17 @@ export async function apiClient<T>(action: string, payload?: Record<string, unkn
   }
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout — no infinite pending
+
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ action, initData, ...payload }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -61,9 +67,13 @@ export async function apiClient<T>(action: string, payload?: Record<string, unkn
     return data;
   } catch (error) {
     console.error(`API Error (${action}):`, error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Unknown error' 
+    let message = error instanceof Error ? error.message : 'Unknown error';
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      message = 'Request timed out (15s). Server may be unreachable.';
+    }
+    return {
+      success: false,
+      error: message
     };
   }
 }

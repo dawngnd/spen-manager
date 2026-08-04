@@ -20,11 +20,13 @@ export function CategorizeDrawer({
   
   const categorizeMutation = useCategorizeTransaction()
   const [success, setSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Reset success state when reopening
   useEffect(() => {
     if (open) {
       setSuccess(false)
+      setError(null)
     }
   }, [open])
 
@@ -32,10 +34,10 @@ export function CategorizeDrawer({
   const childCategories = categories.filter((c: any) => c.parent_id)
 
   const handleSelectCategory = (parentId: string, childId: string) => {
-    // alert(`Click registered! TxID: ${transactionId}`);
+    setError(null)
     console.log('[categorize] click', { transactionId, parentId, childId })
     if (!transactionId) {
-      alert('Lỗi: Không tìm thấy transactionId (ID giao dịch trống)');
+      setError('Không tìm thấy transactionId (ID giao dịch trống)')
       return
     }
     categorizeMutation.mutate(
@@ -44,7 +46,7 @@ export function CategorizeDrawer({
         onSuccess: (response) => {
           console.log('[categorize] success', response)
           if (!response.success) {
-            alert('Lỗi từ Server: ' + response.error);
+            setError('Lỗi từ Server: ' + (response.error || 'unknown'))
             return;
           }
           setSuccess(true)
@@ -55,7 +57,7 @@ export function CategorizeDrawer({
         },
         onError: (error) => {
           console.error('[categorize] error', error)
-          alert('Lỗi API: ' + (error as any)?.message)
+          setError('Lỗi API: ' + ((error as any)?.message || 'unknown'))
         },
       }
     )
@@ -86,6 +88,11 @@ export function CategorizeDrawer({
         </div>
         
         <div className="overflow-y-auto p-4 space-y-6 flex-1">
+          {error && (
+            <div className="shrink-0 p-3 rounded-lg border border-red-500/50 bg-red-500/10 text-red-500 text-sm font-medium">
+              {error}
+            </div>
+          )}
           {isLoadingCategories ? (
             <div className="flex justify-center p-8">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -96,11 +103,17 @@ export function CategorizeDrawer({
             </div>
           ) : (
             <div className="space-y-6 pb-6">
+              {categorizeMutation.isPending && (
+                <div className="shrink-0 flex items-center justify-center gap-2 p-2 text-muted-foreground text-sm font-medium">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Đang lưu...
+                </div>
+              )}
               {parentCategories.map((parent: any) => (
                 <div key={parent.id} className="space-y-2">
                   <div className="font-medium text-sm text-muted-foreground px-2 flex items-center gap-2">
-                    <span 
-                      className="w-3 h-3 rounded-full" 
+                    <span
+                      className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: parent.color }}
                     />
                     {parent.icon} {parent.name}
@@ -125,7 +138,9 @@ export function CategorizeDrawer({
                             }
                           }}
                           aria-disabled={categorizeMutation.isPending}
-                          className="flex items-center gap-2 p-3 text-sm rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent hover:text-accent-foreground active:bg-accent active:text-accent-foreground transition-colors cursor-pointer select-none"
+                          className={`flex items-center gap-2 p-3 text-sm rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent hover:text-accent-foreground active:bg-accent active:text-accent-foreground transition-colors cursor-pointer select-none ${
+                            categorizeMutation.isPending ? 'opacity-50' : ''
+                          }`}
                         >
                           <span
                             className="w-2 h-2 rounded-full shrink-0"
