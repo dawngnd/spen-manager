@@ -57,7 +57,7 @@ export function CategorizeDrawer({
           <DrawerTitle>Chọn danh mục</DrawerTitle>
         </DrawerHeader>
         
-        <div className="overflow-y-auto p-4 space-y-6">
+        <div className="overflow-y-auto p-4 space-y-6" data-vaul-no-drag>
           {isLoadingCategories ? (
             <div className="flex justify-center p-8">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
