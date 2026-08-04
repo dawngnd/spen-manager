@@ -31,8 +31,12 @@ export function CategorizeDrawer({
   const childCategories = categories.filter((c: any) => c.parent_id)
 
   const handleSelectCategory = (parentId: string, childId: string) => {
+    // alert(`Click registered! TxID: ${transactionId}`);
     console.log('[categorize] click', { transactionId, parentId, childId })
-    if (!transactionId) return
+    if (!transactionId) {
+      alert('Lỗi: Không tìm thấy transactionId (ID giao dịch trống)');
+      return
+    }
     categorizeMutation.mutate(
       { transaction_id: transactionId, category_parent_id: parentId, category_child_id: childId },
       {
@@ -99,7 +103,15 @@ export function CategorizeDrawer({
                       .map((child: any) => (
                         <button
                           key={child.id}
-                          onClick={() => handleSelectCategory(parent.id, child.id)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleSelectCategory(parent.id, child.id);
+                          }}
+                          onPointerDown={(e) => {
+                            // Telegram Android Webview sometimes swallows onClick in fixed containers
+                            e.preventDefault();
+                            handleSelectCategory(parent.id, child.id);
+                          }}
                           disabled={categorizeMutation.isPending}
                           className="flex items-center gap-2 p-3 text-sm rounded-lg border bg-card text-card-foreground shadow-sm active:bg-accent active:text-accent-foreground transition-colors disabled:opacity-50 text-left cursor-pointer"
                         >
