@@ -8,6 +8,7 @@ on:
       - 'src/**'
       - 'esbuild.config.js'
       - '.github/workflows/clasp-push.yml'
+  workflow_dispatch:
 
 jobs:
   clasp-push:
