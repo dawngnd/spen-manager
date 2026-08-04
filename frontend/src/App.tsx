@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import WebApp from '@twa-dev/sdk';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useAppStore } from '@/store';
 import Layout from '@/components/Layout';
@@ -13,10 +12,15 @@ function App() {
 
   useEffect(() => {
     try {
+      const WebApp = (window as any).Telegram?.WebApp;
+      if (!WebApp) {
+        console.warn('Telegram WebApp is missing. Are you running inside Telegram?');
+        return;
+      }
+      
       WebApp.ready();
       WebApp.expand();
       
-      // disableVerticalSwipes may not exist on older Telegram versions
       if (typeof WebApp.disableVerticalSwipes === 'function') {
         WebApp.disableVerticalSwipes();
       }
