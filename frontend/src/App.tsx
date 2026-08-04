@@ -9,7 +9,6 @@ import Budget from '@/pages/Budget';
 
 function App() {
   const { setInitData, setTheme } = useAppStore();
-  const initData = useAppStore(state => state.initData);
 
   useEffect(() => {
     try {
