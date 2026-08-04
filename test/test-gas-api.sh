@@ -13,7 +13,7 @@
 #   GAS_URL=https://...  ./test/test-gas-api.sh ping
 # ============================================================
 
-GAS_URL="${GAS_URL:-https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec}"
+GAS_URL="${GAS_URL:-https://script.google.com/macros/s/AKfycbzwMX3j0MJY-7Rk2dZITlBvnAvTW9wy5jZNPreDuQQprfGUBaFrNOLvBqb5MWgfik0j0w/exec}"
 
 # Colors
 GREEN='\033[0;32m'

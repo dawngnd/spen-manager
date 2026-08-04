@@ -24,7 +24,14 @@ export function doPost(e: GoogleAppsScript.Events.DoPost) {
     }
 
     let result: any = null;
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    
+    // Lazy-load spreadsheet only when needed (ping doesn't need it)
+    const getSpreadsheet = () => {
+      const spreadsheetId = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
+      if (!spreadsheetId) throw new Error('SPREADSHEET_ID is not set in Script Properties');
+      return SpreadsheetApp.openById(spreadsheetId);
+    };
+    let ss: GoogleAppsScript.Spreadsheet.Spreadsheet;
 
     // Switch case for future API routing (Phase 3)
     switch (action) {
@@ -33,6 +40,7 @@ export function doPost(e: GoogleAppsScript.Events.DoPost) {
         break;
         
       case 'get_categories': {
+        ss = getSpreadsheet();
         const sheet = ss.getSheetByName('Categories');
         if (!sheet) throw new Error('Categories sheet not found');
         const data = sheet.getDataRange().getValues();
@@ -51,6 +59,7 @@ export function doPost(e: GoogleAppsScript.Events.DoPost) {
       }
         
       case 'upsert_category': {
+        ss = getSpreadsheet();
         result = withLock(() => {
           const sheet = ss.getSheetByName('Categories');
           if (!sheet) throw new Error('Categories sheet not found');
@@ -86,6 +95,7 @@ export function doPost(e: GoogleAppsScript.Events.DoPost) {
       }
         
       case 'delete_category': {
+        ss = getSpreadsheet();
         withLock(() => {
           if (!payload.id) throw new Error('Category id is required');
           const sheet = ss.getSheetByName('Categories');
@@ -111,6 +121,7 @@ export function doPost(e: GoogleAppsScript.Events.DoPost) {
         
       case 'get_transactions':
       case 'get_dashboard': {
+        ss = getSpreadsheet();
         const sheet = ss.getSheetByName('Transactions');
         if (!sheet) throw new Error('Transactions sheet not found');
         const data = sheet.getDataRange().getValues();
@@ -134,6 +145,7 @@ export function doPost(e: GoogleAppsScript.Events.DoPost) {
       }
         
       case 'categorize_transaction': {
+        ss = getSpreadsheet();
         withLock(() => {
           if (!payload.id) throw new Error('Transaction id is required');
           const sheet = ss.getSheetByName('Transactions');
