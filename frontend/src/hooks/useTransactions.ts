@@ -76,10 +76,15 @@ export function useCategorizeTransaction() {
     onSuccess: (response) => {
       if (!response.success || !response.data) return
       const updated = response.data as Transaction
-      
+
       queryClient.setQueryData<Transaction[]>(['transactions'], (old) => {
-        if (!old) return [updated]
-        return old.map(t => t.id === updated.id ? updated : t)
+        // Normalize: cache may hold { success, data } object shape or array
+        const arr: Transaction[] = Array.isArray(old)
+          ? old
+          : Array.isArray((old as any)?.data)
+            ? (old as any).data
+            : []
+        return arr.map(t => t.id === updated.id ? updated : t)
       })
     },
   })

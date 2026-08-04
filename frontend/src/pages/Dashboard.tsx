@@ -1,26 +1,18 @@
 import { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, LayoutDashboard, Wallet, AlertCircle } from 'lucide-react';
-import { apiClient, type Transaction, type Category } from '@/lib/api';
+import { useGetTransactions } from '@/hooks/useTransactions';
+import { useGetCategories } from '@/hooks/useCategories';
+import type { Category } from '@/lib/api';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#f46a9b'];
 
 export default function Dashboard() {
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  const { data: txnData } = useQuery({
-    queryKey: ['transactions'],
-    queryFn: () => apiClient<Transaction[]>('get_transactions'),
-  });
-
-  const { data: catData } = useQuery({
-    queryKey: ['categories'],
-    queryFn: () => apiClient<Category[]>('get_categories'),
-  });
-
-  const transactions = txnData?.data || [];
-  const categories = catData?.data || [];
+  const { data: transactions = [] } = useGetTransactions();
+  const { data: catResponse } = useGetCategories();
+  const categories: Category[] = catResponse?.data || [];
 
   const currentMonthTxns = useMemo(() => {
     return transactions.filter(t => {
