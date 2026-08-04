@@ -12,31 +12,47 @@ function App() {
   const { setInitData, setTheme } = useAppStore();
 
   useEffect(() => {
-    WebApp.ready();
-    WebApp.expand();
-    WebApp.disableVerticalSwipes();
-    
-    if (WebApp.initData) {
-      setInitData(WebApp.initData);
-    }
-    
-    const updateTheme = () => {
-      const isDark = WebApp.colorScheme === 'dark';
-      setTheme(isDark ? 'dark' : 'light');
+    try {
+      WebApp.ready();
+      WebApp.expand();
       
-      if (isDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
+      // disableVerticalSwipes may not exist on older Telegram versions
+      if (typeof WebApp.disableVerticalSwipes === 'function') {
+        WebApp.disableVerticalSwipes();
       }
-    };
-    
-    updateTheme();
-    WebApp.onEvent('themeChanged', updateTheme);
-    
-    return () => {
-      WebApp.offEvent('themeChanged', updateTheme);
-    };
+      
+      if (WebApp.initData) {
+        setInitData(WebApp.initData);
+      }
+      
+      const updateTheme = () => {
+        try {
+          const isDark = WebApp.colorScheme === 'dark';
+          setTheme(isDark ? 'dark' : 'light');
+          
+          if (isDark) {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch {
+          // Fallback: use system preference
+          const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          setTheme(isDark ? 'dark' : 'light');
+          if (isDark) document.documentElement.classList.add('dark');
+        }
+      };
+      
+      updateTheme();
+      WebApp.onEvent('themeChanged', updateTheme);
+      
+      return () => {
+        WebApp.offEvent('themeChanged', updateTheme);
+      };
+    } catch (err) {
+      console.warn('Telegram WebApp SDK init failed:', err);
+      // App still renders even without Telegram context
+    }
   }, [setInitData, setTheme]);
 
   return (
