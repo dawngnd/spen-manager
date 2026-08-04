@@ -63,6 +63,7 @@ function testTelegram() { return global.testTelegram(); }
   // The IIFE should set global.X = realFunction
   const finalCode = `var global = this;\n${code}\n${footer}`;
 
+  require('fs').mkdirSync('dist', { recursive: true });
   require('fs').writeFileSync('dist/Code.js', finalCode);
   console.log('BUILD OK');
 }).catch((e) => { console.error(e); process.exit(1); });
