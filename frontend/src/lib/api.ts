@@ -49,11 +49,8 @@ export async function apiClient<T>(action: string, payload?: Record<string, unkn
   try {
     const response = await fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'text/plain',
-        ...(initData ? { 'x-telegram-init-data': initData } : {}),
-      },
-      body: JSON.stringify({ action, ...payload }),
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action, initData, ...payload }),
     });
 
     if (!response.ok) {
