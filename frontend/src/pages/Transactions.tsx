@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
-import { useGetTransactions } from '@/hooks/useTransactions';
+import { useGetTransactions, useReloadAllTransactions } from '@/hooks/useTransactions';
 import { useGetCategories } from '@/hooks/useCategories';
 import { CategorizeDrawer } from '@/components/CategorizeDrawer';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import type { Transaction, Category } from '@/lib/api';
 
 function getMonthKey(date: Date): string {
@@ -16,10 +16,10 @@ function formatMonth(key: string): string {
 }
 
 export default function Transactions() {
-  const { data: txnResponse, isLoading: txnLoading } = useGetTransactions();
+  const { data: transactions = [], isLoading: txnLoading } = useGetTransactions();
   const { data: catResponse } = useGetCategories();
-  const transactions: Transaction[] = (txnResponse?.data as Transaction[]) || [];
   const categories: Category[] = catResponse?.data || [];
+  const reloadAll = useReloadAllTransactions();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTxnId, setSelectedTxnId] = useState<string | null>(null);
@@ -99,7 +99,17 @@ export default function Transactions() {
 
   return (
     <div className="p-4 pb-24">
-      <h1 className="text-2xl font-bold mb-4">Lịch sử giao dịch</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold">Lịch sử giao dịch</h1>
+        <button
+          onClick={() => reloadAll.mutate()}
+          disabled={reloadAll.isPending}
+          className="p-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+          title="Tải lại tất cả"
+        >
+          <RefreshCw className={`w-5 h-5 ${reloadAll.isPending ? 'animate-spin' : ''}`} />
+        </button>
+      </div>
 
       {/* Month navigator */}
       <div className="flex items-center justify-between bg-card border border-border rounded-lg p-3 mb-4">

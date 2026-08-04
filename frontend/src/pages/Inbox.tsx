@@ -1,20 +1,15 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Inbox as InboxIcon } from 'lucide-react';
-import { apiClient, type Transaction } from '@/lib/api';
+import type { Transaction } from '@/lib/api';
+import { useGetTransactions } from '@/hooks/useTransactions';
 import { CategorizeDrawer } from '@/components/CategorizeDrawer';
 
 export default function Inbox() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTxnId, setSelectedTxnId] = useState<string | null>(null);
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['transactions'],
-    queryFn: () => apiClient<Transaction[]>('get_transactions'),
-  });
-
-  const transactions = data?.data || [];
-  const uncategorized = transactions.filter(t => !t.category_parent_id && !t.category_child_id);
+  const { data: transactions = [], isLoading } = useGetTransactions();
+  const uncategorized = transactions.filter((t: Transaction) => t.status !== 'categorized');
 
   const handleTransactionClick = (id: string) => {
     setSelectedTxnId(id);
@@ -34,14 +29,6 @@ export default function Inbox() {
             <div className="w-16 h-4 bg-muted rounded"></div>
           </div>
         ))}
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-4 text-destructive">
-        Error loading transactions
       </div>
     );
   }

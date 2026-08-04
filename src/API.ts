@@ -119,7 +119,46 @@ export function doPost(e: GoogleAppsScript.Events.DoPost) {
         break;
       }
         
-      case 'get_transactions':
+      case 'get_transactions': {
+        ss = getSpreadsheet();
+        result = withLock(() => {
+          const sheet = ss.getSheetByName('Transactions');
+          if (!sheet) throw new Error('Transactions sheet not found');
+          const data = sheet.getDataRange().getValues();
+          if (data.length <= 1) return [];
+          
+          const unfetched: any[] = [];
+          const rowsToMark: number[] = [];
+          
+          for (let i = 1; i < data.length; i++) {
+            if (data[i][10] !== 'true') {
+              unfetched.push({
+                id: data[i][0],
+                gmail_message_id: data[i][1],
+                date: data[i][2],
+                amount: data[i][3],
+                type: data[i][4],
+                merchant: data[i][5],
+                reference: data[i][6],
+                status: data[i][7],
+                category_parent_id: data[i][8],
+                category_child_id: data[i][9]
+              });
+              rowsToMark.push(i + 1); // 1-indexed sheet row
+            }
+          }
+          
+          // Mark fetched
+          for (const row of rowsToMark) {
+            sheet.getRange(row, 11).setValue('true');
+          }
+          
+          return unfetched;
+        });
+        break;
+      }
+      
+      case 'get_all_transactions':
       case 'get_dashboard': {
         ss = getSpreadsheet();
         const sheet = ss.getSheetByName('Transactions');
@@ -140,13 +179,24 @@ export function doPost(e: GoogleAppsScript.Events.DoPost) {
             category_parent_id: row[8],
             category_child_id: row[9]
           }));
+          
+          // For get_all_transactions, also mark all as fetched
+          if (action === 'get_all_transactions') {
+            withLock(() => {
+              for (let i = 1; i < data.length; i++) {
+                if (data[i][10] !== 'true') {
+                  sheet.getRange(i + 1, 11).setValue('true');
+                }
+              }
+            });
+          }
         }
         break;
       }
         
       case 'categorize_transaction': {
         ss = getSpreadsheet();
-        withLock(() => {
+        result = withLock(() => {
           if (!payload.id) throw new Error('Transaction id is required');
           const sheet = ss.getSheetByName('Transactions');
           if (!sheet) throw new Error('Transactions sheet not found');
@@ -161,9 +211,25 @@ export function doPost(e: GoogleAppsScript.Events.DoPost) {
           }
           
           if (rowIndex > -1) {
+            const catParent = payload.category_parent_id || '';
+            const catChild = payload.category_child_id || '';
             sheet.getRange(rowIndex, 8, 1, 3).setValues([
-              ['categorized', payload.category_parent_id || '', payload.category_child_id || '']
+              ['categorized', catParent, catChild]
             ]);
+            
+            const row = sheet.getRange(rowIndex, 1, 1, 11).getValues()[0];
+            return {
+              id: row[0],
+              gmail_message_id: row[1],
+              date: row[2],
+              amount: row[3],
+              type: row[4],
+              merchant: row[5],
+              reference: row[6],
+              status: row[7],
+              category_parent_id: row[8],
+              category_child_id: row[9]
+            };
           } else {
             throw new Error('Transaction not found');
           }

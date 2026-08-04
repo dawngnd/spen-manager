@@ -13,10 +13,10 @@ export function setup() {
   if (!transactionsSheet) {
     transactionsSheet = ss.insertSheet('Transactions');
   }
-  transactionsSheet.getRange(1, 1, 1, 10).setValues([[
-    'id', 'gmail_message_id', 'date', 'amount', 'type', 'merchant', 'reference', 'status', 'category_parent_id', 'category_child_id'
+  transactionsSheet.getRange(1, 1, 1, 11).setValues([[
+    'id', 'gmail_message_id', 'date', 'amount', 'type', 'merchant', 'reference', 'status', 'category_parent_id', 'category_child_id', 'fetched'
   ]]);
-  transactionsSheet.getRange(1, 1, 1, 10).setFontWeight('bold');
+  transactionsSheet.getRange(1, 1, 1, 11).setFontWeight('bold');
 
   // 2. Categories
   let categoriesSheet = ss.getSheetByName('Categories');

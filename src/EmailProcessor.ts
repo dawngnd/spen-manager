@@ -155,6 +155,7 @@ export function processEmails(): void {
               parsedTx.reference,
               'uncategorized',
               '',
+              '',
               ''
             ]);
           }
