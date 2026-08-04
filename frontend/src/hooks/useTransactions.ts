@@ -32,7 +32,7 @@ export function useGetTransactions() {
     staleTime: Infinity,
     gcTime: Infinity,
     // Normalize data from persisted cache (might be object instead of array)
-    select: (data) => Array.isArray(data) ? data : ((data as any)?.data || []),
+    select: (data): Transaction[] => Array.isArray(data) ? data : ((data as any)?.data || []),
   })
 }
 
