@@ -38,6 +38,8 @@ export async function apiClient<T>(action: string, payload?: Record<string, unkn
   const initData = useAppStore.getState().initData;
   const apiUrl = import.meta.env.VITE_API_URL;
   
+  console.log(`[API] ${action} | initData: ${initData ? initData.substring(0, 50) + '...' : 'NULL'} | url: ${apiUrl}`);
+  
   if (!apiUrl) {
     console.error('VITE_API_URL is not defined');
     return { success: false, error: 'API URL missing' };
