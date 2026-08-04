@@ -131,42 +131,42 @@ export function doPost(e: GoogleAppsScript.Events.DoPost) {
         
       case 'get_transactions': {
         ss = getSpreadsheet();
-        result = withLock(() => {
-          const sheet = ss.getSheetByName('Transactions');
-          if (!sheet) throw new Error('Transactions sheet not found');
-          const data = sheet.getDataRange().getValues();
-          if (data.length <= 1) return [];
-          
-          const unfetched: any[] = [];
-          const rowsToMark: number[] = [];
-          
-          for (let i = 1; i < data.length; i++) {
-            if (data[i][10] !== 'true') {
-              unfetched.push({
-                id: data[i][0],
-                gmail_message_id: data[i][1],
-                date: data[i][2],
-                amount: data[i][3],
-                type: data[i][4],
-                merchant: data[i][5],
-                reference: data[i][6],
-                status: data[i][7],
-                category_parent_id: data[i][8],
-                category_child_id: data[i][9]
-              });
-              rowsToMark.push(i + 1); // 1-indexed sheet row
-            }
+        // Read-only: no script lock needed (holding a lock here serializes
+        // concurrent requests and causes timeouts on the next categorize call).
+        const sheet = ss.getSheetByName('Transactions');
+        if (!sheet) throw new Error('Transactions sheet not found');
+        const data = sheet.getDataRange().getValues();
+        if (data.length <= 1) { result = []; break; }
+
+        const unfetched: any[] = [];
+        const rowsToMark: number[] = [];
+
+        for (let i = 1; i < data.length; i++) {
+          if (data[i][10] !== 'true') {
+            unfetched.push({
+              id: data[i][0],
+              gmail_message_id: data[i][1],
+              date: data[i][2],
+              amount: data[i][3],
+              type: data[i][4],
+              merchant: data[i][5],
+              reference: data[i][6],
+              status: data[i][7],
+              category_parent_id: data[i][8],
+              category_child_id: data[i][9]
+            });
+            rowsToMark.push(i + 1); // 1-indexed sheet row
           }
-          
-          // Batch mark as fetched (single write instead of N writes)
-          if (rowsToMark.length > 0) {
-            const ranges = rowsToMark.map(row => `K${row}`);
-            const rangeList = sheet.getRangeList(ranges);
-            rangeList.setValue('true');
-          }
-          
-          return unfetched;
-        });
+        }
+
+        // Batch mark as fetched (single write instead of N writes)
+        if (rowsToMark.length > 0) {
+          const ranges = rowsToMark.map(row => `K${row}`);
+          const rangeList = sheet.getRangeList(ranges);
+          rangeList.setValue('true');
+        }
+
+        result = unfetched;
         break;
       }
       

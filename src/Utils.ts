@@ -1,15 +1,17 @@
 /**
  * Executes a callback within a Script Lock to prevent race conditions.
+ * Only used for WRITE operations (reads don't need a lock — holding a lock
+ * during a read serializes concurrent requests and can cause timeouts).
  * @param callback The function to execute securely.
- * @param timeoutMs The maximum time to wait for the lock (default 10000ms).
+ * @param timeoutMs The maximum time to wait for the lock (default 3000ms).
  */
-export function withLock<T>(callback: () => T, timeoutMs: number = 10000): T {
+export function withLock<T>(callback: () => T, timeoutMs: number = 3000): T {
   const lock = LockService.getScriptLock();
   try {
     lock.waitLock(timeoutMs);
     return callback();
   } catch (e) {
-    throw new Error(`Failed to acquire lock within ${timeoutMs}ms: ${e}`);
+    throw new Error(`Lock busy: ${e}`);
   } finally {
     lock.releaseLock();
   }
