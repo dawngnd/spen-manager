@@ -43,7 +43,8 @@ export function getProcessedMessageIds(): Set<string> {
       }
     }
   }
-
+  
+  console.log(`[getProcessedMessageIds] Found ${processedIds.size} already processed messages.`);
   return processedIds;
 }
 
@@ -54,6 +55,7 @@ export function fetchUnprocessedEmails(processedIds: Set<string>): GoogleAppsScr
   // We also constrain by provider domains if needed, or just generally search unread.
   const searchQuery = 'is:unread -label:spen-processed';
   const threads = GmailApp.search(searchQuery, 0, 50);
+  console.log(`[fetchUnprocessedEmails] Found ${threads.length} threads matching query: ${searchQuery}`);
 
   for (const thread of threads) {
     const messages = thread.getMessages();
@@ -76,6 +78,7 @@ export function fetchUnprocessedEmails(processedIds: Set<string>): GoogleAppsScr
     }
   }
 
+  console.log(`[fetchUnprocessedEmails] Found ${messagesToProcess.length} messages matching providers.`);
   return messagesToProcess;
 }
 
@@ -88,12 +91,15 @@ function getOrCreateLabel(labelName: string): GoogleAppsScript.Gmail.GmailLabel 
 }
 
 export function processEmails(): void {
+  console.log('[processEmails] Starting email processing job...');
   const processedIds = getProcessedMessageIds();
   const messages = fetchUnprocessedEmails(processedIds);
   
   if (messages.length === 0) {
+    console.log('[processEmails] No new messages to process. Exiting.');
     return;
   }
+  console.log(`[processEmails] Processing ${messages.length} messages...`);
 
   const scriptProperties = PropertiesService.getScriptProperties();
   const spreadsheetId = scriptProperties.getProperty('SPREADSHEET_ID');
@@ -128,9 +134,15 @@ export function processEmails(): void {
       const messageId = message.getId();
       const dateStr = message.getDate().toISOString();
 
-      const provider = PROVIDERS.find(p => p.match(subject, from));
-      if (!provider) continue;
+      console.log(`[processEmails] Processing message ${messageId} from ${from} | subject: ${subject}`);
 
+      const provider = PROVIDERS.find(p => p.match(subject, from));
+      if (!provider) {
+        console.log(`[processEmails] No provider matched for message ${messageId}. Skipping.`);
+        continue;
+      }
+
+      console.log(`[processEmails] Matched provider: ${provider.name}. Parsing...`);
       const parsedTx = provider.parse(body, subject);
       
       withLock(() => {
@@ -170,9 +182,11 @@ export function processEmails(): void {
             };
           }
           sendMessage(msgText, options);
+          console.log(`[processEmails] Successfully parsed & saved transaction ${parsedTx.amount} VND for message ${messageId}`);
           
         } else {
           // Failed to parse -> append to Unparsed sheet
+          console.log(`[processEmails] Failed to parse message ${messageId}`);
           allParsedInThread = false;
           const unparsedSheet = ss.getSheetByName('Unparsed');
           if (unparsedSheet) {
