@@ -21,10 +21,12 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-background text-foreground">
-      <main className="flex-1 overflow-y-auto pb-20">
+      <main className="flex-1 overflow-y-auto pb-20 relative">
         {children}
+        <div className="absolute top-2 right-2 text-[10px] text-muted-foreground/50 pointer-events-none z-50">
+          v0.0.1
+        </div>
       </main>
-      
       <nav className="fixed bottom-0 w-full bg-background border-t border-border pb-safe">
         <div className="flex justify-around items-center h-16">
           {tabs.map((tab) => {
