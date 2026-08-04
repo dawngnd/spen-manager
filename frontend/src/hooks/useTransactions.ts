@@ -41,9 +41,14 @@ export function useReloadAllTransactions() {
   return useMutation({
     mutationFn: async () => {
       const response = await apiClient<Transaction[]>('get_all_transactions')
-      return (response.data as Transaction[]) || []
+      console.log('[ReloadAll] response:', response)
+      if (!response.success || !Array.isArray(response.data)) {
+        throw new Error(response.error || 'Failed to reload transactions')
+      }
+      return response.data as Transaction[]
     },
     onSuccess: (data) => {
+      console.log('[ReloadAll] setting cache with', data.length, 'transactions')
       queryClient.setQueryData(['transactions'], data)
     },
   })
