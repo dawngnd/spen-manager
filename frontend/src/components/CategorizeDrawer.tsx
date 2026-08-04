@@ -30,16 +30,21 @@ export function CategorizeDrawer({
   const childCategories = categories.filter((c: any) => c.parent_id)
 
   const handleSelectCategory = (parentId: string, childId: string) => {
+    console.log('[categorize] click', { transactionId, parentId, childId })
     if (!transactionId) return
     categorizeMutation.mutate(
       { transaction_id: transactionId, category_parent_id: parentId, category_child_id: childId },
       {
-        onSuccess: () => {
+        onSuccess: (response) => {
+          console.log('[categorize] success', response)
           setSuccess(true)
           setTimeout(() => {
             setSuccess(false)
             onOpenChange(false)
           }, 1000)
+        },
+        onError: (error) => {
+          console.error('[categorize] error', error)
         },
       }
     )
@@ -80,7 +85,7 @@ export function CategorizeDrawer({
                           key={child.id}
                           onClick={() => handleSelectCategory(parent.id, child.id)}
                           disabled={categorizeMutation.isPending}
-                          className="flex items-center gap-2 p-3 text-sm rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50 text-left"
+                          className="flex items-center gap-2 p-3 text-sm rounded-lg border bg-card text-card-foreground shadow-sm active:bg-accent active:text-accent-foreground transition-colors disabled:opacity-50 text-left"
                         >
                           <span 
                             className="w-2 h-2 rounded-full" 
