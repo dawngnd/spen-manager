@@ -13,7 +13,8 @@ export const TimoProvider: EmailProvider = {
     const lowerSubject = subject.toLowerCase();
     return lowerSubject.includes('biến động số dư') || 
            lowerSubject.includes('giao dịch') || 
-           lowerSubject.includes('balance notification');
+           lowerSubject.includes('balance notification') ||
+           lowerSubject.includes('thay đổi số dư');
   },
   
   parse: (body: string, subject: string): ParsedTransaction | null => {
