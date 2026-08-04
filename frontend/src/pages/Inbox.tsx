@@ -70,8 +70,8 @@ export default function Inbox() {
                   <p className="text-sm text-muted-foreground">{new Date(t.date).toLocaleDateString('vi-VN')}</p>
                 </div>
                 <div className="text-right">
-                  <p className={`font-bold ${t.type.toLowerCase() === 'expense' ? 'text-destructive' : 'text-green-500'}`}>
-                    {t.type.toLowerCase() === 'expense' ? '-' : '+'}
+                  <p className={`font-bold ${t.type.toLowerCase() === 'expense' || t.type.toLowerCase() === 'transfer' ? 'text-destructive' : 'text-green-500'}`}>
+                    {t.type.toLowerCase() === 'expense' || t.type.toLowerCase() === 'transfer' ? '-' : '+'}
                     {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(t.amount)}
                   </p>
                   <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground uppercase font-medium">
