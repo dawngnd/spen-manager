@@ -9,6 +9,7 @@ import Budget from '@/pages/Budget';
 
 function App() {
   const { setInitData, setTheme } = useAppStore();
+  const initData = useAppStore(state => state.initData);
 
   useEffect(() => {
     try {
@@ -27,6 +28,9 @@ function App() {
       
       if (WebApp.initData) {
         setInitData(WebApp.initData);
+      } else {
+        console.warn('WebApp.initData is empty! Are you opening via inline keyboard/bot menu?');
+        // For local development, set a dummy string if you want to bypass this check locally.
       }
       
       const updateTheme = () => {
@@ -55,10 +59,13 @@ function App() {
       };
     } catch (err) {
       console.warn('Telegram WebApp SDK init failed:', err);
-      // App still renders even without Telegram context
     }
   }, [setInitData, setTheme]);
 
+  // If we are strictly in Telegram, we might want to wait for initData. 
+  // However, local dev needs to work too. 
+  // For now, let's render unconditionally but we will also patch React Query `enabled` in hooks.
+  
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Layout>

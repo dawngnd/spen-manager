@@ -1,11 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api'
 import type { Category } from '@/lib/api'
+import { useAppStore } from '@/store'
 
 export function useGetCategories() {
+  const initData = useAppStore(state => state.initData)
+  
   return useQuery({
     queryKey: ['categories'],
     queryFn: () => apiClient<Category[]>('get_categories'),
+    enabled: !!initData, // Don't fetch until initData is populated
   })
 }
 

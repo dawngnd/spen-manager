@@ -1,10 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api'
+import { useAppStore } from '@/store'
 
 export function useGetTransactions() {
+  const initData = useAppStore(state => state.initData)
+  
   return useQuery({
     queryKey: ['transactions'],
     queryFn: () => apiClient('get_transactions'),
+    enabled: !!initData, // Wait for initData
   })
 }
 
