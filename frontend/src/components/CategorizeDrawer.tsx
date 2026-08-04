@@ -2,6 +2,7 @@ import { useGetCategories } from "@/hooks/useCategories"
 import { useCategorizeTransaction } from "@/hooks/useTransactions"
 import { Loader2 } from "lucide-react"
 import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 
 interface CategorizeDrawerProps {
   open: boolean
@@ -60,7 +61,9 @@ export function CategorizeDrawer({
     )
   }
 
-  return (
+  if (!open) return null
+
+  return createPortal(
     <>
       {/* Backdrop */}
       <div
@@ -130,6 +133,7 @@ export function CategorizeDrawer({
           )}
         </div>
       </div>
-    </>
+    </>,
+    document.body
   )
 }
