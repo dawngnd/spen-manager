@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useGetTransactions } from '@/hooks/useTransactions';
 import { useGetCategories } from '@/hooks/useCategories';
 import { CategorizeDrawer } from '@/components/CategorizeDrawer';
-import { Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Transaction, Category } from '@/lib/api';
 
 function getMonthKey(date: Date): string {
@@ -18,7 +18,7 @@ function formatMonth(key: string): string {
 export default function Transactions() {
   const { data: txnResponse, isLoading: txnLoading } = useGetTransactions();
   const { data: catResponse } = useGetCategories();
-  const transactions: Transaction[] = txnResponse?.data || [];
+  const transactions: Transaction[] = (txnResponse?.data as Transaction[]) || [];
   const categories: Category[] = catResponse?.data || [];
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -48,13 +48,7 @@ export default function Transactions() {
   }, [transactions, selectedMonth]);
 
   // Available months for navigation
-  const availableMonths = useMemo(() => {
-    const months = new Set<string>();
-    for (const t of transactions) {
-      months.add(getMonthKey(new Date(t.date)));
-    }
-    return Array.from(months).sort().reverse();
-  }, [transactions]);
+
 
   const navigateMonth = (direction: -1 | 1) => {
     const [y, m] = selectedMonth.split('-').map(Number);
