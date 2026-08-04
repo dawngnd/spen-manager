@@ -53,7 +53,7 @@ export function fetchUnprocessedEmails(processedIds: Set<string>): GoogleAppsScr
   
   // We can search for unread messages that haven't been labeled yet.
   // We also constrain by provider domains if needed, or just generally search unread.
-  const searchQuery = 'is:unread -label:spen-processed';
+  const searchQuery = 'from:timo is:unread newer_than:1d';
   const threads = GmailApp.search(searchQuery, 0, 50);
   console.log(`[fetchUnprocessedEmails] Found ${threads.length} threads matching query: ${searchQuery}`);
 
