@@ -109,22 +109,31 @@ export function CategorizeDrawer({
                     {childCategories
                       .filter((c: any) => c.parent_id === parent.id)
                       .map((child: any) => (
-                        <button
+                      <div
                           key={child.id}
+                          role="button"
+                          tabIndex={0}
                           onClick={() => {
-                            // alert('Click: ' + child.name);
+                            if (categorizeMutation.isPending) return
                             handleSelectCategory(parent.id, child.id);
                           }}
-                          disabled={categorizeMutation.isPending}
-                          className="flex items-center gap-2 p-3 text-sm rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent hover:text-accent-foreground active:bg-accent active:text-accent-foreground transition-colors disabled:opacity-50 text-left cursor-pointer"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault()
+                              if (categorizeMutation.isPending) return
+                              handleSelectCategory(parent.id, child.id);
+                            }
+                          }}
+                          aria-disabled={categorizeMutation.isPending}
+                          className="flex items-center gap-2 p-3 text-sm rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent hover:text-accent-foreground active:bg-accent active:text-accent-foreground transition-colors cursor-pointer select-none"
                         >
-                          <span 
-                            className="w-2 h-2 rounded-full shrink-0" 
+                          <span
+                            className="w-2 h-2 rounded-full shrink-0"
                             style={{ backgroundColor: child.color }}
                           />
                           <span className="text-base shrink-0">{child.icon}</span>
                           <span className="truncate">{child.name}</span>
-                        </button>
+                        </div>
                       ))}
                   </div>
                 </div>
