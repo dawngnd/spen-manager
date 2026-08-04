@@ -8,6 +8,16 @@
     <title>Spen Manager</title>
     <!-- Telegram Web App Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+      console.log("[RAW] href: " + window.location.href);
+      console.log("[RAW] hash: " + window.location.hash);
+      console.log("[RAW] search: " + window.location.search);
+      if (window.Telegram && window.Telegram.WebApp) {
+        console.log("[RAW] Telegram WebApp initData length: " + window.Telegram.WebApp.initData.length);
+      } else {
+        console.log("[RAW] window.Telegram.WebApp is missing");
+      }
+    </script>
     <!-- SPA redirect handler for GitHub Pages 404.html -->
     <script type="text/javascript">
       (function(l) {
