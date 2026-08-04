@@ -24,7 +24,7 @@ export default function Layout({ children }: LayoutProps) {
       <main className="flex-1 overflow-y-auto pb-20 relative">
         {children}
         <div className="absolute top-2 right-2 text-[10px] text-muted-foreground/50 pointer-events-none z-50">
-          v0.0.2
+          v0.0.3
         </div>
       </main>
       <nav className="fixed bottom-0 w-full bg-background border-t border-border pb-safe">

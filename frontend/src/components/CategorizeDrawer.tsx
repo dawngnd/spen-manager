@@ -42,6 +42,10 @@ export function CategorizeDrawer({
       {
         onSuccess: (response) => {
           console.log('[categorize] success', response)
+          if (!response.success) {
+            alert('Lỗi từ Server: ' + response.error);
+            return;
+          }
           setSuccess(true)
           setTimeout(() => {
             setSuccess(false)
@@ -50,6 +54,7 @@ export function CategorizeDrawer({
         },
         onError: (error) => {
           console.error('[categorize] error', error)
+          alert('Lỗi API: ' + (error as any)?.message)
         },
       }
     )
@@ -103,17 +108,12 @@ export function CategorizeDrawer({
                       .map((child: any) => (
                         <button
                           key={child.id}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleSelectCategory(parent.id, child.id);
-                          }}
-                          onPointerDown={(e) => {
-                            // Telegram Android Webview sometimes swallows onClick in fixed containers
-                            e.preventDefault();
+                          onClick={() => {
+                            // alert('Click: ' + child.name);
                             handleSelectCategory(parent.id, child.id);
                           }}
                           disabled={categorizeMutation.isPending}
-                          className="flex items-center gap-2 p-3 text-sm rounded-lg border bg-card text-card-foreground shadow-sm active:bg-accent active:text-accent-foreground transition-colors disabled:opacity-50 text-left cursor-pointer"
+                          className="flex items-center gap-2 p-3 text-sm rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent hover:text-accent-foreground active:bg-accent active:text-accent-foreground transition-colors disabled:opacity-50 text-left cursor-pointer"
                         >
                           <span 
                             className="w-2 h-2 rounded-full shrink-0" 
