@@ -60,12 +60,12 @@ export function useReloadAllTransactions() {
 export function useCategorizeTransaction() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async (params: { transaction_id: string; category_id: string }) => {
+    mutationFn: async (params: { transaction_id: string; category_parent_id: string; category_child_id: string }) => {
       const response = await apiClient<Transaction>('categorize_transaction', {
         action: 'categorize_transaction',
         id: params.transaction_id,
-        category_parent_id: params.category_id,
-        category_child_id: params.category_id,
+        category_parent_id: params.category_parent_id,
+        category_child_id: params.category_child_id,
       })
       return response
     },

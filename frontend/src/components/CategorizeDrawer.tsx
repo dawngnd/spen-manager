@@ -29,10 +29,10 @@ export function CategorizeDrawer({
   const parentCategories = categories.filter((c: any) => !c.parent_id)
   const childCategories = categories.filter((c: any) => c.parent_id)
 
-  const handleSelectCategory = (categoryId: string) => {
+  const handleSelectCategory = (parentId: string, childId: string) => {
     if (!transactionId) return
     categorizeMutation.mutate(
-      { transaction_id: transactionId, category_id: categoryId },
+      { transaction_id: transactionId, category_parent_id: parentId, category_child_id: childId },
       {
         onSuccess: () => {
           setSuccess(true)
@@ -78,7 +78,7 @@ export function CategorizeDrawer({
                       .map((child: any) => (
                         <button
                           key={child.id}
-                          onClick={() => handleSelectCategory(child.id)}
+                          onClick={() => handleSelectCategory(parent.id, child.id)}
                           disabled={categorizeMutation.isPending}
                           className="flex items-center gap-2 p-3 text-sm rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent hover:text-accent-foreground transition-colors disabled:opacity-50 text-left"
                         >
