@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Inbox as InboxIcon } from 'lucide-react';
+import { Inbox as InboxIcon, RefreshCw } from 'lucide-react';
 import type { Transaction } from '@/lib/api';
 import { useGetTransactions } from '@/hooks/useTransactions';
 import { CategorizeDrawer } from '@/components/CategorizeDrawer';
@@ -8,7 +8,7 @@ export default function Inbox() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTxnId, setSelectedTxnId] = useState<string | null>(null);
 
-  const { data: transactions = [], isLoading } = useGetTransactions();
+  const { data: transactions = [], isLoading, refetch, isFetching } = useGetTransactions();
   const uncategorized = transactions.filter((t: Transaction) => t.status !== 'categorized');
 
   const handleTransactionClick = (id: string) => {
@@ -35,7 +35,17 @@ export default function Inbox() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Inbox</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold">Inbox</h1>
+        <button
+          onClick={() => refetch()}
+          disabled={isFetching}
+          className="p-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+          title="Lấy giao dịch mới"
+        >
+          <RefreshCw className={`w-5 h-5 ${isFetching ? 'animate-spin' : ''}`} />
+        </button>
+      </div>
       
       {uncategorized.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
