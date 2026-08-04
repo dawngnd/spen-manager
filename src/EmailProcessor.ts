@@ -82,13 +82,7 @@ export function fetchUnprocessedEmails(processedIds: Set<string>): GoogleAppsScr
   return messagesToProcess;
 }
 
-function getOrCreateLabel(labelName: string): GoogleAppsScript.Gmail.GmailLabel {
-  let label = GmailApp.getUserLabelByName(labelName);
-  if (!label) {
-    label = GmailApp.createLabel(labelName);
-  }
-  return label;
-}
+
 
 export function processEmails(): void {
   console.log('[processEmails] Starting email processing job...');
@@ -110,9 +104,7 @@ export function processEmails(): void {
     return;
   }
 
-  const label = getOrCreateLabel('spen-processed');
-  
-  // Group messages by thread to minimize label operations
+  // Group messages by thread to minimize operations
   const threadMessagesMap = new Map<string, GoogleAppsScript.Gmail.GmailMessage[]>();
   
   for (const message of messages) {
@@ -209,10 +201,10 @@ export function processEmails(): void {
       });
     }
     
-    // Label thread as processed (even if some failed, they are in Unparsed queue and shouldn't be retried indefinitely)
+    // Mark thread as read after processing
     if (threadMsgs.length > 0) {
       const thread = threadMsgs[0].getThread();
-      thread.addLabel(label);
+      thread.markRead();
     }
   }
 }
