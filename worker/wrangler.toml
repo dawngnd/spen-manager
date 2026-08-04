@@ -3,7 +3,7 @@ main = "src/index.ts"
 compatibility_date = "2024-01-01"
 
 [vars]
-GAS_WEB_APP_URL = "https://script.google.com/macros/s/TODO/exec"
+GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzpHYYEin7yt2a3g_PVdcvExLZqRJaeZRJMCjWV2_T3sv8gd2LNrqNtc7jvrMdu4siQ/exec"
 
 [env.production]
 # TELEGRAM_BOT_TOKEN will be provided as a secret
