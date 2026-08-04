@@ -2,6 +2,7 @@ import { useGetCategories } from "@/hooks/useCategories"
 import { useCategorizeTransaction } from "@/hooks/useTransactions"
 import { Loader2 } from "lucide-react"
 import { useState, useEffect } from "react"
+import type { ChangeEvent } from "react"
 import { createPortal } from "react-dom"
 
 interface CategorizeDrawerProps {
@@ -21,17 +22,22 @@ export function CategorizeDrawer({
   const categorizeMutation = useCategorizeTransaction()
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [selectedParent, setSelectedParent] = useState('')
+  const [selectedChild, setSelectedChild] = useState('')
 
-  // Reset success state when reopening
+  // Reset state when reopening
   useEffect(() => {
     if (open) {
       setSuccess(false)
       setError(null)
+      setSelectedParent('')
+      setSelectedChild('')
     }
   }, [open])
 
   const parentCategories = categories.filter((c: any) => !c.parent_id)
   const childCategories = categories.filter((c: any) => c.parent_id)
+  const currentChildren = childCategories.filter((c: any) => c.parent_id === selectedParent)
 
   const handleSelectCategory = (parentId: string, childId: string) => {
     setError(null)
@@ -61,6 +67,25 @@ export function CategorizeDrawer({
         },
       }
     )
+  }
+
+  const onParentChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value
+    setSelectedParent(val)
+    setSelectedChild('')
+    // Nếu parent không có con, tự categorize với chính parent
+    const parentHasChildren = childCategories.some((c: any) => c.parent_id === val)
+    if (val && !parentHasChildren) {
+      handleSelectCategory(val, val)
+    }
+  }
+
+  const onChildChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value
+    setSelectedChild(val)
+    if (selectedParent && val) {
+      handleSelectCategory(selectedParent, val)
+    }
   }
 
   if (!open) return null
@@ -109,50 +134,49 @@ export function CategorizeDrawer({
                   Đang lưu...
                 </div>
               )}
-              {parentCategories.map((parent: any) => (
-                <div key={parent.id} className="space-y-2">
-                  <div className="font-medium text-sm text-muted-foreground px-2 flex items-center gap-2">
-                    <span
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: parent.color }}
-                    />
-                    {parent.icon} {parent.name}
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    {childCategories
-                      .filter((c: any) => c.parent_id === parent.id)
-                      .map((child: any) => (
-                      <div
-                          key={child.id}
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => {
-                            if (categorizeMutation.isPending) return
-                            handleSelectCategory(parent.id, child.id);
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                              e.preventDefault()
-                              if (categorizeMutation.isPending) return
-                              handleSelectCategory(parent.id, child.id);
-                            }
-                          }}
-                          aria-disabled={categorizeMutation.isPending}
-                          className={`flex items-center gap-2 p-3 text-sm rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent hover:text-accent-foreground active:bg-accent active:text-accent-foreground transition-colors cursor-pointer select-none ${
-                            categorizeMutation.isPending ? 'opacity-50' : ''
-                          }`}
-                        >
-                          <span
-                            className="w-2 h-2 rounded-full shrink-0"
-                            style={{ backgroundColor: child.color }}
-                          />
-                          <span className="text-base shrink-0">{child.icon}</span>
-                          <span className="truncate">{child.name}</span>
-                        </div>
-                      ))}
-                  </div>
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-muted-foreground" htmlFor="cat-parent">
+                    Danh mục cha
+                  </label>
+                  <select
+                    id="cat-parent"
+                    value={selectedParent}
+                    onChange={onParentChange}
+                    disabled={categorizeMutation.isPending}
+                    className="w-full p-3 text-sm rounded-lg border bg-card text-card-foreground focus:outline-none cursor-pointer disabled:opacity-50"
+                  >
+                    <option value="">-- Chọn danh mục --</option>
+                    {parentCategories.map((parent: any) => (
+                      <option key={parent.id} value={parent.id}>
+                        {parent.icon} {parent.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-              ))}
+
+                {selectedParent && currentChildren.length > 0 && (
+                  <div className="space-y-1">
+                    <label className="text-sm font-medium text-muted-foreground" htmlFor="cat-child">
+                      Danh mục con
+                    </label>
+                    <select
+                      id="cat-child"
+                      value={selectedChild}
+                      onChange={onChildChange}
+                      disabled={categorizeMutation.isPending}
+                      className="w-full p-3 text-sm rounded-lg border bg-card text-card-foreground focus:outline-none cursor-pointer disabled:opacity-50"
+                    >
+                      <option value="">-- Chọn danh mục con --</option>
+                      {currentChildren.map((child: any) => (
+                        <option key={child.id} value={child.id}>
+                          {child.icon} {child.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
