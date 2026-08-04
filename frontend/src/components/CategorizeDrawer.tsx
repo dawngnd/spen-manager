@@ -1,13 +1,7 @@
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer"
 import { useGetCategories } from "@/hooks/useCategories"
 import { useCategorizeTransaction } from "@/hooks/useTransactions"
 import { Loader2 } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface CategorizeDrawerProps {
   open: boolean
@@ -25,6 +19,13 @@ export function CategorizeDrawer({
   
   const categorizeMutation = useCategorizeTransaction()
   const [success, setSuccess] = useState(false)
+
+  // Reset success state when reopening
+  useEffect(() => {
+    if (open) {
+      setSuccess(false)
+    }
+  }, [open])
 
   const parentCategories = categories.filter((c: any) => !c.parent_id)
   const childCategories = categories.filter((c: any) => c.parent_id)
@@ -51,13 +52,28 @@ export function CategorizeDrawer({
   }
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="max-h-[85vh]">
-        <DrawerHeader>
-          <DrawerTitle>Chọn danh mục</DrawerTitle>
-        </DrawerHeader>
+    <>
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 bg-black/60 z-[99] transition-opacity duration-300 ${
+          open ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => onOpenChange(false)}
+      />
+
+      {/* Form Container */}
+      <div
+        className={`fixed bottom-0 left-0 right-0 max-h-[85vh] bg-background border-t rounded-t-[10px] z-[100] transition-transform duration-300 transform shadow-2xl overflow-hidden flex flex-col ${
+          open ? 'translate-y-0' : 'translate-y-full'
+        }`}
+      >
+        <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted cursor-pointer shrink-0" onClick={() => onOpenChange(false)} />
         
-        <div className="overflow-y-auto p-4 space-y-6" data-vaul-no-drag>
+        <div className="grid gap-1.5 p-4 text-center sm:text-left shrink-0">
+          <h2 className="text-lg font-semibold leading-none tracking-tight">Chọn danh mục</h2>
+        </div>
+        
+        <div className="overflow-y-auto p-4 space-y-6 flex-1">
           {isLoadingCategories ? (
             <div className="flex justify-center p-8">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -67,7 +83,7 @@ export function CategorizeDrawer({
               Đã cập nhật danh mục!
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-6 pb-6">
               {parentCategories.map((parent: any) => (
                 <div key={parent.id} className="space-y-2">
                   <div className="font-medium text-sm text-muted-foreground px-2 flex items-center gap-2">
@@ -85,13 +101,13 @@ export function CategorizeDrawer({
                           key={child.id}
                           onClick={() => handleSelectCategory(parent.id, child.id)}
                           disabled={categorizeMutation.isPending}
-                          className="flex items-center gap-2 p-3 text-sm rounded-lg border bg-card text-card-foreground shadow-sm active:bg-accent active:text-accent-foreground transition-colors disabled:opacity-50 text-left"
+                          className="flex items-center gap-2 p-3 text-sm rounded-lg border bg-card text-card-foreground shadow-sm active:bg-accent active:text-accent-foreground transition-colors disabled:opacity-50 text-left cursor-pointer"
                         >
                           <span 
-                            className="w-2 h-2 rounded-full" 
+                            className="w-2 h-2 rounded-full shrink-0" 
                             style={{ backgroundColor: child.color }}
                           />
-                          <span className="text-base">{child.icon}</span>
+                          <span className="text-base shrink-0">{child.icon}</span>
                           <span className="truncate">{child.name}</span>
                         </button>
                       ))}
@@ -101,7 +117,7 @@ export function CategorizeDrawer({
             </div>
           )}
         </div>
-      </DrawerContent>
-    </Drawer>
+      </div>
+    </>
   )
 }
