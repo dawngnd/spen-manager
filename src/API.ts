@@ -1,6 +1,16 @@
 import { withLock } from './Utils';
 
 /**
+ * Handle GET requests — fallback when POST redirect converts to GET.
+ */
+export function doGet(e: GoogleAppsScript.Events.DoGet) {
+  return ContentService.createTextOutput(JSON.stringify({
+    success: true,
+    data: 'Spen Manager API is running'
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
  * Main entry point for HTTP POST requests to the Google Apps Script Web App.
  * @param e The event object containing the request data.
  */
@@ -148,9 +158,11 @@ export function doPost(e: GoogleAppsScript.Events.DoPost) {
             }
           }
           
-          // Mark fetched
-          for (const row of rowsToMark) {
-            sheet.getRange(row, 11).setValue('true');
+          // Batch mark as fetched (single write instead of N writes)
+          if (rowsToMark.length > 0) {
+            const ranges = rowsToMark.map(row => `K${row}`);
+            const rangeList = sheet.getRangeList(ranges);
+            rangeList.setValue('true');
           }
           
           return unfetched;
@@ -180,13 +192,17 @@ export function doPost(e: GoogleAppsScript.Events.DoPost) {
             category_child_id: row[9]
           }));
           
-          // For get_all_transactions, also mark all as fetched
+          // For get_all_transactions, also mark all as fetched (batch write)
           if (action === 'get_all_transactions') {
             withLock(() => {
+              const unfetchedRows: string[] = [];
               for (let i = 1; i < data.length; i++) {
                 if (data[i][10] !== 'true') {
-                  sheet.getRange(i + 1, 11).setValue('true');
+                  unfetchedRows.push(`K${i + 1}`);
                 }
+              }
+              if (unfetchedRows.length > 0) {
+                sheet.getRangeList(unfetchedRows).setValue('true');
               }
             });
           }
