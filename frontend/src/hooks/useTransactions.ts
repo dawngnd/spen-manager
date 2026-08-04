@@ -15,20 +15,24 @@ export function useGetTransactions() {
     queryKey: ['transactions'],
     queryFn: async (): Promise<Transaction[]> => {
       const existing = queryClient.getQueryData<Transaction[]>(['transactions']) || []
+      // Normalize: cache might have old format { success, data: [...] }
+      const normalized = Array.isArray(existing) ? existing : ((existing as any)?.data || [])
       const response = await apiClient<Transaction[]>('get_transactions')
       const newItems = (response.data as Transaction[]) || []
       
-      if (newItems.length === 0) return existing
+      if (newItems.length === 0) return normalized
       
       // Merge: new items override existing by id
       const map = new Map<string, Transaction>()
-      for (const t of existing) map.set(t.id, t)
+      for (const t of normalized) map.set(t.id, t)
       for (const t of newItems) map.set(t.id, t)
       return Array.from(map.values())
     },
     enabled: !!initData,
     staleTime: Infinity,
     gcTime: Infinity,
+    // Normalize data from persisted cache (might be object instead of array)
+    select: (data) => Array.isArray(data) ? data : ((data as any)?.data || []),
   })
 }
 
